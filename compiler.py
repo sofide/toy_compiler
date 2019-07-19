@@ -58,9 +58,41 @@ def compute_string(string, operation=PLUS):
     return result
 
 
+def solve_parenthesis(string):
+    open_parenthesis_position = string.find('(')
+    if open_parenthesis_position == -1:
+        return string
+    after_open_parenthesis = string[open_parenthesis_position + 1:]
+
+    # solve inner parenthesis
+    after_open_parenthesis = solve_parenthesis(after_open_parenthesis)
+
+    close_parenthesis_position = after_open_parenthesis.find(')')
+
+    if close_parenthesis_position == -1:
+        raise Exception('you forgot to close a parenthesis ")"')
+
+    inside_parenthesis = after_open_parenthesis[:close_parenthesis_position]
+
+    parenthesis_result = str(compute_string(inside_parenthesis))
+
+    pre_parenthesis = string[:open_parenthesis_position]
+    post_parenthesis = after_open_parenthesis[close_parenthesis_position+1:]
+
+    string_with_solved_parenthesis = pre_parenthesis + parenthesis_result + post_parenthesis
+
+    return string_with_solved_parenthesis
+
+
+def compile(string):
+    string = solve_parenthesis(string)
+    result = compute_string(string)
+
+    return result
+
 if __name__ == '__main__':
     string = sys.argv[1]
 
-    result = compute_string(string)
+    result = compile(string)
 
     print(result)
