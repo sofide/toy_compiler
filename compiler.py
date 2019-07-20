@@ -1,3 +1,4 @@
+import itertools
 import sys
 
 CUSTOM_NEGATIVE_OPERATOR = 'This is ugly, I know, sorry for that.'
@@ -42,6 +43,7 @@ operator_map = {
     DIVISION: '/'
 }
 
+
 def compute_string(string, operation=PLUS):
     terms = string.split(operator_map[operation])
     next_step = deeper_step.get(operation)
@@ -72,7 +74,7 @@ def solve_parenthesis(string):
     close_parenthesis_position = after_open_parenthesis.find(')')
 
     if close_parenthesis_position == -1:
-        raise Exception('you forgot to close a parenthesis ")"')
+        raise SyntaxError('you forgot to close a parenthesis ")"')
 
     inside_parenthesis = after_open_parenthesis[:close_parenthesis_position]
 
@@ -105,8 +107,56 @@ def handle_negative_numbers(string):
     return string
 
 
+
+def validate_syntax(string):
+    def hunt_invalid_syntax(error_message, valid_stuff=None, invalid_stuff=None):
+        invalid_characters = []
+        if valid_stuff is not None:
+            invalid_characters.extend([(pos, char) for pos, char in enumerate(string)
+                                       if char not in valid_stuff])
+        if invalid_stuff is not None:
+            invalid_characters.extend([(pos, char) for pos, char in enumerate(string)
+                                       if char in invalid_stuff])
+
+        if invalid_characters:
+            for position, character in invalid_characters:
+                error_message = error_message  + '\n-"{}" in position {}'.format(character,
+                                                                                 position)
+
+            raise SyntaxError(error_message)
+
+
+    non_numeric_valid_characters = list(operator_map.values())
+    non_numeric_valid_characters.extend(('(', ')', '.'))
+    valid_characters = non_numeric_valid_characters + [str(n) for n in range(10)]
+
+
+    hunt_invalid_syntax("I don't understand the following characters:",
+                        valid_stuff=valid_characters)
+
+    non_numeric_valid_characters.remove(')')
+    if string[-1] in non_numeric_valid_characters:
+        error_message = "The expression cannot end with {}".format(string[-1])
+        raise SyntaxError(error_message)
+
+    non_numeric_valid_characters.remove('-')
+    non_numeric_valid_characters.remove('(')
+    invalid_character_combination = list(itertools.product(non_numeric_valid_characters,
+                                                           repeat=2))
+    invalid_character_combination.extend([
+        '.-', '-.', '-)',
+        '+)', '*)', '/)', '.)', ').',
+        '(+', '(*', '(/', '.(', '(.',
+    ])
+
+    hunt_invalid_syntax("The following characters combinations are not allowed:",
+                        invalid_stuff=invalid_character_combination)
+
+
+
 def compile(string):
     string = string.replace(' ', '')
+    validate_syntax(string)
     string = handle_negative_numbers(string)
     string = solve_parenthesis(string)
     result = compute_string(string)
