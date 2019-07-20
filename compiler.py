@@ -1,6 +1,8 @@
 import itertools
 import sys
 
+VARS = {}
+
 CUSTOM_NEGATIVE_OPERATOR = '_MINUS_'
 
 PLUS = 'plus'
@@ -51,9 +53,16 @@ def compute_string(string, operation=PLUS):
         number_terms = []
         for number in terms:
             negative_operators = number.count(CUSTOM_NEGATIVE_OPERATOR)
-            negative_operators_needed = negative_operators % 2
-            number = '-' * negative_operators_needed + number.replace(CUSTOM_NEGATIVE_OPERATOR, '')
-            number = float(number)
+            absolute_number_string = number.replace(CUSTOM_NEGATIVE_OPERATOR, '')
+
+            if absolute_number_string in VARS:
+                number = VARS[absolute_number_string]
+            else:
+                number = float(absolute_number_string)
+
+            if negative_operators % 2:
+                number = number * -1
+
             number_terms.append(number)
     else:
         number_terms = [compute_string(term, next_step) for term in terms]
@@ -139,6 +148,7 @@ def validate_syntax(string):
     non_numeric_valid_characters = list(operator_map.values())
     non_numeric_valid_characters.extend(('(', ')', '.'))
     valid_characters = non_numeric_valid_characters + [str(n) for n in range(10)]
+    valid_characters.extend(VARS)
 
 
     hunt_invalid_syntax("I don't understand the following characters:",
@@ -164,14 +174,28 @@ def validate_syntax(string):
                         q_characters=2)
 
 
+def detect_var_definition(string):
+    equal_operator_position = string.find('=')
+    if equal_operator_position == -1:
+        var_name = None
+    else:
+        var_name = string[:equal_operator_position]
+        string = string[equal_operator_position + 1:]
+
+    return var_name, string
+
+
 
 def compile(string):
     string = string.replace(' ', '')
-    # string = string.replace('-(', '-1*(')
+    var_name, string = detect_var_definition(string)
     validate_syntax(string)
     string = handle_negative_numbers(string)
     string = solve_parenthesis(string)
     result = compute_string(string)
+
+    if var_name is not None:
+        VARS[var_name] = result
 
     return result
 
