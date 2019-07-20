@@ -125,7 +125,7 @@ def validate_syntax(string):
                 error_message = error_message  + '\n-"{}" (character #{})'.format(character,
                                                                                   position+1)
 
-                error_message = error_message + "\n\nNote: blank spaces don't count as characters"
+            error_message = error_message + "\n\nNote: blank spaces don't count as characters"
 
             raise SyntaxError(error_message)
 
@@ -169,7 +169,7 @@ def compile(string):
     return result
 
 if __name__ == '__main__':
-    def execute(string):
+    def main(string):
         try:
             result = compile(string)
         except SyntaxError as error:
@@ -180,8 +180,9 @@ if __name__ == '__main__':
 
     if len(sys.argv) > 1:
         string_to_compute = sys.argv[1]
-        execute(string_to_compute)
+        main(string_to_compute)
 
-    while True:
-        string_to_compute = input("Type an expression to compute: ")
-        execute(string_to_compute)
+    else:
+        while True:
+            string_to_compute = input("Type an expression to compute: ")
+            main(string_to_compute)
