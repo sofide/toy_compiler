@@ -109,14 +109,16 @@ def handle_negative_numbers(string):
 
 
 def validate_syntax(string):
-    def hunt_invalid_syntax(error_message, valid_stuff=None, invalid_stuff=None):
+    def hunt_invalid_syntax(error_message, valid_stuff=None, invalid_stuff=None, q_characters=1):
         invalid_characters = []
         if valid_stuff is not None:
-            invalid_characters.extend([(pos, char) for pos, char in enumerate(string)
-                                       if char not in valid_stuff])
+            invalid_characters.extend([(pos, string[pos:pos+q_characters])
+                                       for pos in range(len(string))
+                                       if string[pos:pos+q_characters] not in valid_stuff])
         if invalid_stuff is not None:
-            invalid_characters.extend([(pos, char) for pos, char in enumerate(string)
-                                       if char in invalid_stuff])
+            invalid_characters.extend([(pos, string[pos:pos+q_characters])
+                                       for pos in range(len(string))
+                                       if string[pos:pos+q_characters] in invalid_stuff])
 
         if invalid_characters:
             for position, character in invalid_characters:
@@ -141,8 +143,8 @@ def validate_syntax(string):
 
     non_numeric_valid_characters.remove('-')
     non_numeric_valid_characters.remove('(')
-    invalid_character_combination = list(itertools.product(non_numeric_valid_characters,
-                                                           repeat=2))
+    invalid_character_combination = itertools.product(non_numeric_valid_characters, repeat=2)
+    invalid_character_combination = [a + b for a, b in invalid_character_combination]
     invalid_character_combination.extend([
         '.-', '-.', '-)',
         '+)', '*)', '/)', '.)', ').',
@@ -150,7 +152,8 @@ def validate_syntax(string):
     ])
 
     hunt_invalid_syntax("The following characters combinations are not allowed:",
-                        invalid_stuff=invalid_character_combination)
+                        invalid_stuff=invalid_character_combination,
+                        q_characters=2)
 
 
 
