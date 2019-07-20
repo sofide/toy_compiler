@@ -1,7 +1,7 @@
 import itertools
 import sys
 
-CUSTOM_NEGATIVE_OPERATOR = 'This is ugly, I know, sorry for that.'
+CUSTOM_NEGATIVE_OPERATOR = '_MINUS_'
 
 PLUS = 'plus'
 MINUS = 'minus'
@@ -48,8 +48,13 @@ def compute_string(string, operation=PLUS):
     terms = string.split(operator_map[operation])
     next_step = deeper_step.get(operation)
     if not next_step:
-        number_terms = [float(number.replace(CUSTOM_NEGATIVE_OPERATOR, '-'))
-                        for number in terms]
+        number_terms = []
+        for number in terms:
+            negative_operators = number.count(CUSTOM_NEGATIVE_OPERATOR)
+            negative_operators_needed = negative_operators % 2
+            number = '-' * negative_operators_needed + number.replace(CUSTOM_NEGATIVE_OPERATOR, '')
+            number = float(number)
+            number_terms.append(number)
     else:
         number_terms = [compute_string(term, next_step) for term in terms]
 
@@ -79,6 +84,7 @@ def solve_parenthesis(string):
     inside_parenthesis = after_open_parenthesis[:close_parenthesis_position]
 
     parenthesis_result = str(compute_string(inside_parenthesis))
+    parenthesis_result = parenthesis_result.replace('-', CUSTOM_NEGATIVE_OPERATOR)
 
     if parenthesis_result[0] == '-':
         parenthesis_result = CUSTOM_NEGATIVE_OPERATOR + parenthesis_result[1:]
@@ -161,6 +167,7 @@ def validate_syntax(string):
 
 def compile(string):
     string = string.replace(' ', '')
+    # string = string.replace('-(', '-1*(')
     validate_syntax(string)
     string = handle_negative_numbers(string)
     string = solve_parenthesis(string)

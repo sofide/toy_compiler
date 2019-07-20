@@ -32,7 +32,11 @@ def test_operations_with_parenthesis(string, result):
      ('3 - -3 ', 6),
      ('3 - (-3) ', 6),
      ('3 + -3 ', 0),
-     ('3 / -3 ', -1)]
+     ('3 / -3 ', -1),
+     ('2 -(-(-3))', -1),
+     ('2 +-(-(-3))', -1),
+     ('2 /-(-(-4))', -0.5),
+     ('2 -(-(-3)*-(1))', 5)]
 )
 def test_operations_with_negative_numbers(string, result):
     assert compile(string) == result
