@@ -37,3 +37,17 @@ def test_operations_with_parenthesis(string, result):
 def test_operations_with_negative_numbers(string, result):
     assert compile(string) == result
 
+
+@pytest.mark.parametrize(
+    'string',
+    ['1**2', '1*)', '1*.1', '1.*1', '1*+1', '1+*1', '1*/1', '1/*1',
+     '1++1', '1+)', '1+.2', '1.+2', '1+/1', '1/+2',
+     '1//2', '1/)2', '1/.1', '1./2',
+     '1-)', '2-.1', '1.-2',
+     '1..2', '2.)1', '1).2',
+     '1+', '1-', '1*', '1/', '1.',
+     '1a+2', 'b2', 'c/a', '2*b']
+
+)
+def test_syntax_validation_errors(string):
+    pytest.raises(SyntaxError, compile, string)
