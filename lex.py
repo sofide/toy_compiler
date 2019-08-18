@@ -46,6 +46,8 @@ tokens = (
     'LPAREN',
     'RPAREN',
     'COMMA',
+    'EQUALS',
+    'NOT_EQUALS',
 )
 
 
@@ -93,6 +95,8 @@ t_DIVIDE = r'/'
 t_LPAREN = r'\('
 t_RPAREN = r'\)'
 t_COMMA = r','
+t_EQUALS = r'='
+t_NOT_EQUALS = r'!='
 
 
 def t_NUMBER(t):
